@@ -1,0 +1,7 @@
+#!/bin/ksh
+
+ARG=$1
+
+[[ $ARG == "--version" ]] && ARG="--modversion"
+
+exec pkg-config $ARG gnutls

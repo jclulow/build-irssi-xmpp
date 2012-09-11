@@ -1,0 +1,9 @@
+/^#include <string.h>/a
+#include <sys/types.h>
+.
+/uint16_t pref, weight, port;/d
+a
+uint16_t pref, port;
+.
+/GETSHORT (weight, pos);/d
+w

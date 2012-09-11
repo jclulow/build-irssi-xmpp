@@ -1,0 +1,44 @@
+--- irssi-0.8.15/src/fe-text/gui-readline.c	2010-04-03 17:19:42.000000000 +0100
++++ gui-readline.c	2012-05-24 10:25:04.000000000 +0100
+@@ -64,6 +64,7 @@
+ static char *paste_old_prompt;
+ static int paste_prompt, paste_line_count;
+ static int paste_join_multiline;
++static int paste_send_multiline;
+ static int paste_timeout_id;
+ 
+ static void sig_input(void);
+@@ -266,7 +267,7 @@
+ 		/* first line has to be kludged kind of to get pasting in the
+ 		   middle of line right.. */
+ 		for (i = 0; i < paste_buffer->len; i++) {
+-			if (arr[i] == '\r' || arr[i] == '\n') {
++			if (!paste_send_multiline && (arr[i] == '\r' || arr[i] == '\n')) {
+ 				i++;
+ 				break;
+ 			}
+@@ -286,7 +287,7 @@
+ 	/* rest of the lines */
+ 	str = g_string_new(NULL);
+ 	for (; i < paste_buffer->len; i++) {
+-		if (arr[i] == '\r' || arr[i] == '\n') {
++		if (!paste_send_multiline && (arr[i] == '\r' || arr[i] == '\n')) {
+ 			history = command_history_current(active_win);
+ 			command_history_add(history, str->str);
+ 
+@@ -930,6 +931,7 @@
+ 
+ 	paste_verify_line_count = settings_get_int("paste_verify_line_count");
+ 	paste_join_multiline = settings_get_bool("paste_join_multiline");
++	paste_send_multiline = settings_get_bool("paste_send_multiline");
+ }
+ 
+ void gui_readline_init(void)
+@@ -954,6 +956,7 @@
+ 	   keycodes. this must be larger to allow them to work. */
+ 	settings_add_int("misc", "paste_verify_line_count", 5);
+ 	settings_add_bool("misc", "paste_join_multiline", TRUE);
++	settings_add_bool("misc", "paste_send_multiline", FALSE);
+         setup_changed();
+ 
+ 	keyboard = keyboard_create(NULL);

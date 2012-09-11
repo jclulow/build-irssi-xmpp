@@ -1,0 +1,12 @@
+/^CFLAGS/d
+a
+CFLAGS = -fPIC -std=c99 -DUOFF_T_LONG
+CFLAGS += -I$(PROTO)/$(PREFIX)/include/loudmouth-1.0
+.
+/^LDFLAGS/d
+a
+LDFLAGS = -shared
+LDFLAGS += -L$(PROTO)/$(PREFIX)/lib
+LDFLAGS += -R$(PREFIX)/lib
+.
+w
