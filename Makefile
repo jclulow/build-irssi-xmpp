@@ -4,37 +4,37 @@ PREFIX		= /opt/irssi-xmpp
 
 PKG_INFO	= /opt/local/sbin/pkg_info
 
-all: 0-setup-stamp \
-	downloads \
+.PHONY: all
+all: \
 	0-irssi-stamp \
 	0-loudmouth-stamp \
 	0-irssi-xmpp-stamp
 
-
-downloads: 0-setup-stamp \
+.PHONY: downloads
+downloads: \
     downloads/loudmouth-1.4.3.tar.gz \
     downloads/irssi-0.8.15.tar.gz \
     downloads/irssi-xmpp-0.52.tar.gz
 
 downloads/loudmouth-1.4.3.tar.gz:
+	@mkdir -p `dirname $@`
 	curl -kL \
 		http://ftp.gnome.org/pub/GNOME/sources/loudmouth/1.4/loudmouth-1.4.3.tar.gz \
 		> $@
 
 downloads/irssi-xmpp-0.52.tar.gz:
+	@mkdir -p `dirname $@`
 	curl -kL \
 		http://cybione.org/~irssi-xmpp/files/irssi-xmpp-0.52.tar.gz \
 		> $@
 
 downloads/irssi-0.8.15.tar.gz:
+	@mkdir -p `dirname $@`
 	curl -kL \
 		http://irssi.org/files/irssi-0.8.15.tar.gz \
 		> $@
 
-0-setup-stamp:
-	mkdir downloads
-	touch 0-setup-stamp
-
+.PHONY:	package-checks
 package-checks:
 	@echo "*** CHECKING FOR GNUTLS"
 	$(PKG_INFO) gnutls >/dev/null 2>&1 || \
@@ -42,6 +42,10 @@ package-checks:
 	@echo "*** CHECKING FOR GLIB2"
 	$(PKG_INFO) glib2 >/dev/null 2>&1 || \
 		(echo "ATTN: you should ... pkgin in glib2" >&2 && exit 1)
+	@echo "*** CHECKING FOR PKG-CONFIG"
+	$(PKG_INFO) pkg-config >/dev/null 2>&1 || \
+		(echo "ATTN: you should ... pkgin in pkg-config" >&2 && exit 1)
+
 
 loudmouth-1.4.3/config.status: loudmouth-1.4.3/configure
 	@echo "*** CONFIGURING LOUDMOUTH"
@@ -55,6 +59,11 @@ loudmouth-1.4.3/configure: package-checks downloads/loudmouth-1.4.3.tar.gz
 	rm -f loudmouth-1.4.3/config.status
 	[[ -f loudmouth-1.4.3/configure ]] && \
 		touch loudmouth-1.4.3/configure
+	@echo "*** FIXING UP LOUDMOUTH"
+	ed -s loudmouth-1.4.3/loudmouth/lm-error.c \
+	    < edscripts/loudmouth.lm-error.ed
+	[[ -f loudmouth-1.4.3/configure ]] && \
+	    touch loudmouth-1.4.3/configure
 
 irssi-0.8.15/configure: downloads/irssi-0.8.15.tar.gz
 	@echo "*** EXTRACTING IRSSI"
@@ -83,7 +92,6 @@ irssi-0.8.15/config.status: package-checks irssi-0.8.15/configure
 	touch 0-loudmouth-stamp
 	@echo "*** DONE WITH LOUDMOUTH"
 
-
 irssi-xmpp-0.52/Makefile: downloads/irssi-xmpp-0.52.tar.gz
 	@echo "*** EXTRACTING IRSSI-XMPP"
 	tar xvfz downloads/irssi-xmpp-0.52.tar.gz
@@ -107,18 +115,18 @@ irssi-xmpp-0.52/Makefile: downloads/irssi-xmpp-0.52.tar.gz
 		make install DESTDIR=$(PROTO)
 	touch 0-irssi-xmpp-stamp
 
+.PHONY: clean
 clean:
 	rm -rf loudmouth-1.4.3
 	rm -rf irssi-xmpp-0.52
 	rm -rf irssi-0.8.15
 	rm -f 0-irssi-stamp 0-irssi-xmpp-stamp 0-loudmouth-stamp
 
+.PHONY: clobber
 clobber: clean
 	rm -rf proto
 
+.PHONY: nuke
 nuke: clobber
-	rm 0-setup-stamp
 	rm -rf downloads
 
-
-.PHONY:	package-checks

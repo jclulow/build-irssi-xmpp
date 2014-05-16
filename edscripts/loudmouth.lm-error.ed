@@ -1,0 +1,5 @@
+/^#include <glib\/gerror.h>/d
+a
+#include <glib.h>
+.
+w
