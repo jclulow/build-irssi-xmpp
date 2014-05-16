@@ -1,5 +1,5 @@
 --- irssi-0.8.15/src/fe-text/gui-readline.c	2010-04-03 17:19:42.000000000 +0100
-+++ gui-readline.c	2012-05-24 10:25:04.000000000 +0100
++++ irssi-0.8.15/src/fe-text/gui-readline.c	2012-05-24 10:25:04.000000000 +0100
 @@ -64,6 +64,7 @@
  static char *paste_old_prompt;
  static int paste_prompt, paste_line_count;

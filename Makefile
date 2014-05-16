@@ -60,6 +60,7 @@ irssi-0.8.15/configure: downloads/irssi-0.8.15.tar.gz
 	@echo "*** EXTRACTING IRSSI"
 	tar xvfz downloads/irssi-0.8.15.tar.gz
 	rm -f irssi-0.8.15/config.status
+	patch -p0 -i patches/irssi.multiline.diff
 	[[ -f irssi-0.8.15/configure ]] && \
 		touch irssi-0.8.15/configure
 
