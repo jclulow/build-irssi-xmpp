@@ -2,6 +2,8 @@
 PROTO		= $(PWD)/proto
 PREFIX		= /opt/irssi-xmpp
 
+IRSSI_VERSION	= 0.8.17
+
 PKG_INFO	= /opt/local/sbin/pkg_info
 
 .PHONY: all
@@ -15,7 +17,7 @@ all: \
 .PHONY: downloads
 downloads: \
     downloads/loudmouth-1.4.3.tar.gz \
-    downloads/irssi-0.8.15.tar.gz \
+    downloads/irssi-$(IRSSI_VERSION).tar.gz \
     downloads/irssi-xmpp-0.52.tar.gz
 
 downloads/loudmouth-1.4.3.tar.gz:
@@ -30,10 +32,10 @@ downloads/irssi-xmpp-0.52.tar.gz:
 		http://cybione.org/~irssi-xmpp/files/irssi-xmpp-0.52.tar.gz \
 		> $@
 
-downloads/irssi-0.8.15.tar.gz:
+downloads/irssi-$(IRSSI_VERSION).tar.gz:
 	@mkdir -p `dirname $@`
 	curl -kL \
-		http://irssi.org/files/irssi-0.8.15.tar.gz \
+		https://github.com/irssi-import/irssi/releases/download/$(IRSSI_VERSION)/irssi-$(IRSSI_VERSION).tar.gz \
 		> $@
 
 ##### PACKAGE CHECKS
@@ -53,23 +55,23 @@ downloads/irssi-0.8.15.tar.gz:
 
 ##### IRSSI
 
-irssi-0.8.15/configure: downloads/irssi-0.8.15.tar.gz
+irssi-$(IRSSI_VERSION)/configure: downloads/irssi-$(IRSSI_VERSION).tar.gz
 	@echo "*** EXTRACTING IRSSI"
-	tar xvfz downloads/irssi-0.8.15.tar.gz
-	rm -f irssi-0.8.15/config.status
-	patch -p0 -i patches/irssi.multiline.diff
-	[[ -f irssi-0.8.15/configure ]] && \
-		touch irssi-0.8.15/configure
+	tar xvfz downloads/irssi-$(IRSSI_VERSION).tar.gz
+	rm -f irssi-$(IRSSI_VERSION)/config.status
+	cd irssi-$(IRSSI_VERSION) && patch -p1 -i ../patches/irssi.multiline.diff
+	[[ -f irssi-$(IRSSI_VERSION)/configure ]] && \
+		touch irssi-$(IRSSI_VERSION)/configure
 
-irssi-0.8.15/config.status: 0-package-stamp irssi-0.8.15/configure
+irssi-$(IRSSI_VERSION)/config.status: 0-package-stamp irssi-$(IRSSI_VERSION)/configure
 	@echo "*** CONFIGURING IRSSI"
 	export LDFLAGS="-R$(PREFIX)/lib" && \
-	cd irssi-0.8.15 && \
+	cd irssi-$(IRSSI_VERSION) && \
 		./configure --prefix=$(PREFIX)
 
-0-irssi-stamp: 0-package-stamp irssi-0.8.15/config.status
+0-irssi-stamp: 0-package-stamp irssi-$(IRSSI_VERSION)/config.status
 	@echo "*** BUILDING IRSSI"
-	cd irssi-0.8.15 && \
+	cd irssi-$(IRSSI_VERSION) && \
 		make install DESTDIR=$(PROTO)
 	touch $@
 	@echo "*** DONE WITH IRSSI"
@@ -135,7 +137,7 @@ irssi-xmpp-0.52/Makefile: downloads/irssi-xmpp-0.52.tar.gz
 clean:
 	rm -rf loudmouth-1.4.3
 	rm -rf irssi-xmpp-0.52
-	rm -rf irssi-0.8.15
+	rm -rf irssi-$(IRSSI_VERSION)
 	rm -f 0-irssi-stamp 0-irssi-xmpp-stamp 0-loudmouth-stamp
 
 .PHONY: clobber
