@@ -3,6 +3,7 @@ PROTO		= $(PWD)/proto
 PREFIX		= /opt/irssi-xmpp
 
 IRSSI_VERSION	= 0.8.17
+XMPP_VERSION	= 0.53
 
 PKG_INFO	= /opt/local/sbin/pkg_info
 
@@ -18,7 +19,7 @@ all: \
 downloads: \
     downloads/loudmouth-1.4.3.tar.gz \
     downloads/irssi-$(IRSSI_VERSION).tar.gz \
-    downloads/irssi-xmpp-0.52.tar.gz
+    downloads/irssi-xmpp-$(XMPP_VERSION).tar.gz
 
 downloads/loudmouth-1.4.3.tar.gz:
 	@mkdir -p `dirname $@`
@@ -26,10 +27,10 @@ downloads/loudmouth-1.4.3.tar.gz:
 		http://ftp.gnome.org/pub/GNOME/sources/loudmouth/1.4/loudmouth-1.4.3.tar.gz \
 		> $@
 
-downloads/irssi-xmpp-0.52.tar.gz:
+downloads/irssi-xmpp-$(XMPP_VERSION).tar.gz:
 	@mkdir -p `dirname $@`
 	curl -kL \
-		http://cybione.org/~irssi-xmpp/files/irssi-xmpp-0.52.tar.gz \
+		http://cybione.org/~irssi-xmpp/files/irssi-xmpp-$(XMPP_VERSION).tar.gz \
 		> $@
 
 downloads/irssi-$(IRSSI_VERSION).tar.gz:
@@ -105,24 +106,24 @@ loudmouth-1.4.3/configure: 0-package-stamp downloads/loudmouth-1.4.3.tar.gz
 
 ##### IRSSI-XMPP
 
-irssi-xmpp-0.52/Makefile: downloads/irssi-xmpp-0.52.tar.gz
+irssi-xmpp-$(XMPP_VERSION)/Makefile: downloads/irssi-xmpp-$(XMPP_VERSION).tar.gz
 	@echo "*** EXTRACTING IRSSI-XMPP"
-	tar xvfz downloads/irssi-xmpp-0.52.tar.gz
+	tar xvfz downloads/irssi-xmpp-$(XMPP_VERSION).tar.gz
 	@echo "*** FIXING UP IRSSI-XMPP"
-	ed -s irssi-xmpp-0.52/src/core/module.h \
+	ed -s irssi-xmpp-$(XMPP_VERSION)/src/core/module.h \
 		< edscripts/irssi-xmpp.decls.ed
-	ed -s irssi-xmpp-0.52/src/fe-common/module.h \
+	ed -s irssi-xmpp-$(XMPP_VERSION)/src/fe-common/module.h \
 		< edscripts/irssi-xmpp.decls.ed
-	ed -s irssi-xmpp-0.52/src/fe-text/module.h \
+	ed -s irssi-xmpp-$(XMPP_VERSION)/src/fe-text/module.h \
 		< edscripts/irssi-xmpp.decls.ed
-	ed -s irssi-xmpp-0.52/config.mk \
+	ed -s irssi-xmpp-$(XMPP_VERSION)/config.mk \
 		< edscripts/irssi-xmpp.config.ed
-	[[ -f irssi-xmpp-0.52/Makefile ]] && \
-		touch irssi-xmpp-0.52/Makefile
+	[[ -f irssi-xmpp-$(XMPP_VERSION)/Makefile ]] && \
+		touch irssi-xmpp-$(XMPP_VERSION)/Makefile
 
-0-irssi-xmpp-stamp: 0-package-stamp irssi-xmpp-0.52/Makefile 0-loudmouth-stamp
+0-irssi-xmpp-stamp: 0-package-stamp irssi-xmpp-$(XMPP_VERSION)/Makefile 0-loudmouth-stamp
 	@echo "*** BUILDING IRSSI-XMPP"
-	cd irssi-xmpp-0.52 && \
+	cd irssi-xmpp-$(XMPP_VERSION) && \
 		export PKG_CONFIG_PATH=$(PROTO)/$(PREFIX)/lib/pkgconfig && \
 		export PREFIX=$(PREFIX) && \
 		export PROTO=$(PROTO) && \
@@ -136,7 +137,7 @@ irssi-xmpp-0.52/Makefile: downloads/irssi-xmpp-0.52.tar.gz
 .PHONY: clean
 clean:
 	rm -rf loudmouth-1.4.3
-	rm -rf irssi-xmpp-0.52
+	rm -rf irssi-xmpp-$(XMPP_VERSION)
 	rm -rf irssi-$(IRSSI_VERSION)
 	rm -f 0-irssi-stamp 0-irssi-xmpp-stamp 0-loudmouth-stamp
 
